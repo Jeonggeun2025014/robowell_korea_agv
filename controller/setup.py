@@ -14,12 +14,14 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='jglim',
-    maintainer_email='jglim@todo.todo',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer_email='jglim@tinhatc.ac.kr',
+    description='robowell korea agv controller',
+    license='Apache License, Version 2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'robowell_korea_agv_controller = controller.controller:main',
+            'robowell_korea_agv_robot = controller.robot:main'
         ],
     },
 )
