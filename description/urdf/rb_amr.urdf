@@ -1,22 +1,13 @@
 <?xml version="1.0"?>
 <robot name="rb_amr">
 
-  <!-- ===== base_link : 조립체 STL은 여기 visual로만 ===== -->
   <link name="base_link">
-    <!-- <visual>
-      <origin xyz="-0.25 -0.20 -0.10" rpy="1.5708 0 1.5708"/>
-      <geometry>
-        <mesh filename="package://description/meshes/RB_AMR_ASSY.STL"
-              scale="0.001 0.001 0.001"/>
-      </geometry>
-    </visual> -->
-
     <!-- collision은 STL 대신 단순 박스 추천(물리 안정) -->
     <collision>
       <origin xyz="0 0 0.10" rpy="0 0 0"/>
-      <!-- <origin xyz="0 0 0.10" rpy="1.5708 0 1.5708"/> -->
       <geometry>
-        <box size="0.40 0.30 0.20"/>
+        <box size="0.40 0.20 0.20"/>
+        <!-- <box size="0.40 0.30 0.20"/> -->
       </geometry>
     </collision>
 
@@ -27,11 +18,9 @@
     </inertial>
   </link>
 
-  <!-- ===== STL 표시용 링크 (시각화 전용) ===== -->
+  <!-- ===== STL 표시용 링크 (시각화에만 사용한다) ===== -->
   <link name="base_visual">
     <visual>
-      <!-- 원래 base_link에 있던 STL visual을 여기로 옮김 -->
-      <!-- <origin xyz="-0.25 -0.20 -0.10" rpy="1.5708 0 1.5708"/> -->
       <origin xyz="0.19 -0.35 -0.0545" rpy="1.5708 0 -3.14160"/>
       <geometry>
         <mesh filename="package://description/meshes/RB_AMR_ASSY.STL"
@@ -45,15 +34,35 @@
     <parent link="base_link"/>
     <child link="base_visual"/>
 
-    <!-- 🔥 여기서 방향 보정: 현재 linear.x가 오른쪽(+y)로 가니 yaw -90도 -->
+    <!-- 여기서 방향 보정: 모델을 불러오면 linear.x가 오른쪽(+y) 방향이어서 yaw -90도 보정했음 -->
     <origin xyz="0 0 0" rpy="0 0 -1.5708"/>
+  </joint>
+
+  <!-- ===== LiDAR 링크 ===== -->
+  <link name="lidar_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.05"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <!-- base_link에 고정했음 - 추후에는 LiDAR 모델을 따로 불러오는게 좋음 -->
+  <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <!-- 로봇에 맞게 수정: (앞쪽 x, 위쪽 z) -->
+    <origin xyz="0.14 0.00 0.20" rpy="0 0 0"/>
   </joint>
 
   <!-- ===== 왼쪽 바퀴 ===== -->
   <link name="left_wheel_link">
-    <!-- 필요하면 visual은 투명 처리 가능(겉모습은 STL에 이미 있음) -->
     <visual>
-      <!-- <origin xyz="0 0 0" rpy="0 1.5708 0"/> -->
       <origin xyz="0 0 0" rpy="1.5708 0 0"/>
       <geometry>
         <cylinder radius="0.033" length="0.02"/>
@@ -84,10 +93,9 @@
   <joint name="left_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="left_wheel_link"/>
-    <!-- ⚠️ 아래 값은 로봇에 맞게 튜닝 필요 -->
+    <!-- 왼쪽 휠의 위치를 로봇에 맞게 수정해주세요. -->
     <origin xyz="0.0 0.11 0.03" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <!-- <axis xyz="1 0 0"/> -->
   </joint>
 
   <!-- ===== 오른쪽 바퀴 ===== -->
@@ -123,10 +131,9 @@
   <joint name="right_wheel_joint" type="continuous">
     <parent link="base_link"/>
     <child link="right_wheel_link"/>
-    <!-- ⚠️ 아래 값은 로봇에 맞게 튜닝 필요 -->
+    <!-- 오른쪽 휠의 위치를 로봇에 맞게 수정해주세요 -->
     <origin xyz="0.0 -0.11 0.03" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <!-- <axis xyz="1 0 0"/> -->
   </joint>
 
   <!-- ===== Gazebo diff_drive : cmd_vel -> wheel joints ===== -->
@@ -140,7 +147,7 @@
       <left_joint>left_wheel_joint</left_joint>
       <right_joint>right_wheel_joint</right_joint>
 
-      <!-- ⚠️ 로봇 치수에 맞게 반드시 수정 -->
+      <!-- 로봇 치수에 맞게 반드시 수정해주세요 -->
       <wheel_separation>0.18</wheel_separation>
       <wheel_diameter>0.066</wheel_diameter>
 
@@ -154,6 +161,45 @@
       <publish_odom_tf>true</publish_odom_tf>
       <update_rate>50</update_rate>
     </plugin>
+  </gazebo>
+
+  <gazebo reference="lidar_link">
+    <sensor name="lidar" type="ray">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>10</update_rate>
+
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>180</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.5708</min_angle>
+            <max_angle>1.5708</max_angle>
+          </horizontal>
+        </scan>
+
+        <range>
+          <min>0.12</min> <!-- 단위: m -->
+          <max>3.0</max>
+          <resolution>0.01</resolution>
+        </range>
+
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+
+      <!-- ROS2로 /scan 토픽 발행 -->
+      <plugin name="gazebo_ros_laser" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=scan</remapping>
+        </ros>
+        <frame_name>lidar_link</frame_name>
+      </plugin>
+    </sensor>
   </gazebo>
 
 </robot>
