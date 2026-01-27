@@ -1,3 +1,5 @@
+# Copyright 2026 Inhatc
+# Authors: Jeonggeun Lim
 
 from geometry_msgs.msg import Twist 
 import rclpy
