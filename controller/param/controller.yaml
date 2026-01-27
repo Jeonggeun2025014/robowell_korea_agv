@@ -1,0 +1,9 @@
+controller:
+  ros__parameters:
+    robot:
+      wheels:
+        seperation: 0.160
+        radius: 0.033
+
+    control:
+      control_period: 0.5

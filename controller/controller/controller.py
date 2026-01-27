@@ -6,27 +6,35 @@ from rclpy.node import Node
 class Controller(Node):
     def __init__(self):
         super().__init__('robowell_korea_agv_controller')
-        timer_period = 0.5  # seconds
+        self.init_parameters()
+        self.init_publishers()
+        self.timer_ = self.create_timer(self.control_period, self.controller_timer)
 
-        self.publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
+    def init_parameters(self):
+        self.declare_parameter('control.control_period', 0.5)
+        self.control_period = self.get_parameter('control.control_period').value
 
-        self.timer = self.create_timer(timer_period, self.controller_timer)
+    def init_publishers(self):
+        self.cmd_vel_publisher_ = self.create_publisher(Twist, 'cmd_vel', 10)
 
     def controller_timer(self):
         msg = Twist()
-        self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.angular.x)
-
+        msg.linear.x = 0.2
+        msg.angular.z = 0.1
+        self.cmd_vel_publisher_.publish(msg)
 
 def main(args=None):
     rclpy.init(args=args)
 
     robowell_korea_agv_controller = Controller()
 
-    rclpy.spin(robowell_korea_agv_controller)
-
-    robowell_korea_agv_controller.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(robowell_korea_agv_controller)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        robowell_korea_agv_controller.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
