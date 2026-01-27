@@ -1,3 +1,6 @@
+# Copyright 2026 Inhatc
+# Authors: Jeonggeun Lim
+
 from setuptools import find_packages, setup
 import os
 import glob
@@ -6,7 +9,7 @@ package_name = 'controller'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='1.0.1',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',

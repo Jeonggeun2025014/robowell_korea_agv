@@ -1,8 +1,11 @@
+<!-- Copyright 2026 Inhatc -->
+<!-- Authors: Jeonggeun Lim -->
+
 <?xml version="1.0"?>
 <robot name="rb_amr">
 
   <link name="base_link">
-    <!-- collision은 STL 대신 단순 박스 추천(물리 안정) -->
+    <!-- collision은 STL 대신 단순 박스(물리적으로 안정적임) -->
     <collision>
       <origin xyz="0 0 0.10" rpy="0 0 0"/>
       <geometry>
@@ -138,6 +141,7 @@
 
   <!-- ===== Gazebo diff_drive : cmd_vel -> wheel joints ===== -->
   <gazebo>
+    <!-- ROS2로 cmd_vel, odom 토픽 발행 -->
     <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
       <ros>
         <remapping>cmd_vel:=cmd_vel</remapping>
@@ -201,5 +205,4 @@
       </plugin>
     </sensor>
   </gazebo>
-
 </robot>

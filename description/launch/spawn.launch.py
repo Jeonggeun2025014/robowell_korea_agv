@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright 2026 Inhatc
+# Authors: Jeonggeun Lim
+
 import os
 import tempfile
 

@@ -1,3 +1,6 @@
+# Copyright 2026 Inhatc
+# Authors: Jeonggeun Lim
+
 from geometry_msgs.msg import Twist 
 from geometry_msgs.msg import Pose
 import rclpy
@@ -44,7 +47,6 @@ def main(args=None):
     finally:
         robowell_korea_agv_robot.destroy_node()
         rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()
