@@ -6,6 +6,8 @@ from geometry_msgs.msg import Pose
 import rclpy
 from rclpy.node import Node
 
+import RPi.GPIO as gpio
+
 class Robot(Node):
     def __init__(self):
         super().__init__('robowell_korea_agv_robot')
@@ -31,9 +33,30 @@ class Robot(Node):
 
     def calculate_motor_rpm(self, msg: Twist):
         self.get_logger().info(f'cmd_vel: lin.x={msg.linear.x}, ang.z={msg.angular.z}')
+        
         # Insert function to calculate motor rpm from cmd_vel
         # and 
         # Send rpm to motor controller
+
+    def raspberry_pi_control(self, msg: Twist):
+        PWM_PIN_DIR = {18, 20, 22, 24}
+        PWM_PIN_VEL = {19, 21, 23, 25}
+        pwm = [0, 0, 0, 0]
+
+        pwm_frequency = 1000
+
+        gpio.setmode(gpio.BCM)
+
+        for pin in range(len(PWM_PIN_DIR)):
+            gpio.setup(PWM_PIN_DIR[pin], gpio.OUT)
+            gpio.PWM(PWM_PIN_DIR[pin], gpio.HIGH)
+            pwm[pin] = gpio.setup(PWM_PIN_VEL[pin], gpio.OUT)
+            pwm[pin] = gpio.PWM(PWM_PIN_VEL[pin], pwm_frequency)
+
+        pwm[0].start(10)
+        pwm[1].start(10)
+        pwm[2].start(10)
+        pwm[3].start(10)
 
 def main(args=None):
     rclpy.init(args=args)
