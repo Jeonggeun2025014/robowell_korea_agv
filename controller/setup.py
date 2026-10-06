@@ -28,7 +28,8 @@ setup(
     entry_points={
         'console_scripts': [
             'robowell_korea_agv_controller = controller.controller:main',
-            'robowell_korea_agv_robot = controller.robot:main'
+            'robowell_korea_agv_robot = controller.robot:main',
+            'robowell_korea_agv_arrow_teleop = controller.arrow_teleop:main',
         ],
     },
 )

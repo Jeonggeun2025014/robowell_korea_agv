@@ -12,6 +12,7 @@ class Controller(Node):
         super().__init__('robowell_korea_agv_controller')
         self.init_parameters()
         self.init_publishers()
+        self.init_subscribers()
         self.timer_ = self.create_timer(self.control_period, self.controller_timer)
         self.cmd_vel = Twist()
 
@@ -20,12 +21,19 @@ class Controller(Node):
         self.control_period = self.get_parameter('control.control_period').value
 
     def init_publishers(self):
-        self.cmd_vel_publisher_ = self.create_publisher(Twist, 'desired_cmd_vel', 10)
+        self.cmd_vel_publisher_ = self.create_publisher(Twist, 'desired_cmd_vel', 10)\
+
+    def init_subscribers(self):
+        self.subscriber_ = self.create_subscription(
+            Twist, 'example_cmd_vel', self.subscribe_example_cmd_vel, 10)
 
     def controller_timer(self):
-        self.cmd_vel.linear.x = 0.1
-        self.cmd_vel.angular.z = 0.0
+        # self.cmd_vel.linear.x = 0.1
+        # self.cmd_vel.angular.z = 0.0
         self.cmd_vel_publisher_.publish(self.cmd_vel)
+
+    def subscribe_example_cmd_vel(self, msg: Twist):
+        self.cmd_vel = msg
 
     def stop(self):
         self.timer_.cancel()
