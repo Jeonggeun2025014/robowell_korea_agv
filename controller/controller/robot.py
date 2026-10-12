@@ -1,7 +1,7 @@
 # Copyright 2026 Inhatc
 # Authors: Jeonggeun Lim
 
-from geometry_msgs.msg import Twist 
+from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Pose
 import rclpy
 from rclpy.node import Node
@@ -24,7 +24,7 @@ class Robot(Node):
 
     def init_subscribers(self):
         self.subscriber_ = self.create_subscription(
-            Twist, 'cmd_vel', self.subscribe_cmd_vel, 10)
+            Twist, 'desired_cmd_vel', self.subscribe_cmd_vel, 10)
 
     def subscribe_cmd_vel(self, msg: Twist):
         self.calculate_motor_rpm(msg)
@@ -42,11 +42,11 @@ def main(args=None):
 
     try:
         rclpy.spin(robowell_korea_agv_robot)
-    except:
+    except KeyboardInterrupt:
         pass
     finally:
         robowell_korea_agv_robot.destroy_node()
-        rclpy.shutdown()
+        rclpy.try_shutdown()
 
 if __name__ == '__main__':
     main()
